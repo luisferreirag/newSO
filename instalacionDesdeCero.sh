@@ -153,11 +153,18 @@ _install() {
     
     # Intellij
     #----------
-    operation=$(dialog --stdout --title "¿Intalar Intellij-idea-ultimate snapd?" \
+    operation=$(dialog --stdout --title "¿Intalar Intellij-idea-ultimate?" \
                 --backtitle "$0" \
                 --yesno "Sí - No" 7 60)
     if [[ $? -eq 0 ]]; then
-        sudo snap install intellij-idea-ultimate --classic
+        if [[ $DIST = 'Ubuntu' ]]; then
+	    sudo snap install intellij-idea-ultimate --classic
+	else
+	    echo "Se instala paquete NO oficial. Ojo con eso"
+	    sudo apt install libnss3 default-jdk
+	    sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+	    sudo flatpak install flathub com.jetbrains.IntelliJ-IDEA-Community
+	fi
     fi
     ((N++))
     
