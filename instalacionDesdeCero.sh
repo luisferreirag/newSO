@@ -65,7 +65,8 @@ _opcional() {
                 --backtitle "$0" \
                 --yesno "$1" 7 60)
     if [[ $? -eq 0 ]]; then
-        _inst ${2[*]}
+    	P=$2
+        _inst ${P[*]}
     fi
     ((N++))
 }
@@ -110,8 +111,9 @@ _install() {
               # conky-all
         #PAQ+=(gsconnect gnome-browser-connector gnome-tweak-tool)
     elif [[ $DIST == 'Debian' ]]; then 
-        PAQ=(firefox chromium batcat)
+        PAQ=(firefox chromium bat)
         _opcional "¿Instalar paquetes firefox, chromium y batcat?" $PAQ 
+	echo "Recuerda que Konsole permite split con C+( y C+), además de Monitor de silencio C+I, Monitor de actividad C+A y sólo lectura"
     # else PAQ+=(tilix conky-all batcat)
     fi
 
@@ -129,8 +131,6 @@ _install() {
     #  24   │ Radio++ (radio@driglu4it)
 
 
-    #echo "Se van a instalar los paquetes: ${PAQ[*]}"
-    #_inst ${PAQ[*]}
     sudo apt-get autoremove
 
 
@@ -143,11 +143,11 @@ _install() {
         for i in "${PAQ[@]}"; do
 		echo "$i"
 		sudo snap install "$i"
-        	#sudo snap install ${PAQ[*]}
         done
     else
+	# echo "Debemos instalar snapd"
         sudo service snapd status
-        if [[ ! $? ]]; then _inst snap;	fi
+        if [[ ! -z $? ]]; then _inst snapd;	fi
     fi
 
     
@@ -172,6 +172,7 @@ _install() {
                 --yesno "¿Instalar docker y Compose(v2)?" 7 60)
     if [[ $? -eq 0 ]]; then
         docker -v 2>/dev/null; [[ $? -eq 0 ]] && echo "Docker ya está instalado" ||  ( curl https://get.docker.com/ -o get_docker.sh && chmod +x get_docker.sh && sudo ./get_docker.sh )
+	rm get_docker.sh
         cat /etc/group | grep docker >/dev/null; [[ ! $? -eq 0 ]] && sudo groupadd docker
         id | grep docker >/dev/null
         if [[ ! $? -eq 0 ]]; then 
@@ -194,6 +195,7 @@ _install() {
     if [[ $? -eq 0 ]]; then
         wget -q https://www.tug.org/fonts/getnonfreefonts/install-getnonfreefonts
         sudo texlua ./install-getnonfreefonts
+	rm install-getnonfreefonts
         sudo getnonfreefonts --sys -a
         sudo mktexlsr
         sudo updmap --sys
@@ -349,6 +351,6 @@ while getopts ":hila:" option; do
          _links;;
       a) # AppImage
          _appImage;;
-      *) echo "Error: Invalid option";;
+      * ) echo "Error: Invalid option";;
    esac
 done
