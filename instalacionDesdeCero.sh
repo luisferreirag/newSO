@@ -321,43 +321,25 @@ _links(){
  
 } #_links()
 
-############################################################
-# AppImage                                                 #
-############################################################
-_appImage() {
-# AppImage
-BASE='/media/homeUbuntu/luis/Documentos/AppImage'
-echo "-----------------------------------------"
-ls $BASE
-# query the latest Linux release from the QOwnNotes API, parse the JSON for the URL and download it
-#curl -L https://api.qownnotes.org/latest_releases/linux | jq .url | xargs curl -Lo QOwnNotes-x86_64.AppImage
-#chmod a+x QOwnNotes-*.AppImage
-#mv QOwnNotes-x86_64.AppImage "$BASE/"
-} # _appImage()
+
+
+
 
 ############################################################
 ############################################################
 # Main program                                             #
 ############################################################
-
-############################################################
-# Process the input options. Add options as needed.        #
-############################################################
-cd $PWD
-if [[ $# -eq 0 ]]; then _help; fi
-# Get the options
-while getopts ":hila:" option; do
-   case $option in
-      h) # display Help
-         _help
-         exit;;
-      i) # install packages
-         _install;;
-         #Name=$OPTARG;;
-      l) # create links
-         _links;;
-      a) # AppImage
-         _appImage;;
-      * ) echo "Error: Invalid option";;
-   esac
+while true ; do
+    OPTIONS=$(dialog --no-tags --clear --backtitle "$0" \
+		 --title "¿Que hacer?" \
+		 --radiolist "Usa ESPACIO para seleccionar/deseleccionar y OK para acabar."  30 100 3 \
+		 crear_enlaces "Crear enlaces" off \
+		 instalar_software "Instalar software" off \
+		 salir "SALIR" on \
+		 2>&1 > /dev/tty)
+		 
+    echo $OPTIONS
+    if [[ "$OPTIONS" = "crear_enlaces" ]]; then _links; fi
+    if [[ "$OPTIONS" = "instalar_software" ]]; then _install; fi
+    if [[ "$OPTIONS" = "salir" ]]; then break; fi
 done
